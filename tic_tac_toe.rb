@@ -1,4 +1,4 @@
-class Chessboard
+class Board
     def initialize
         @board = [1,2,3,4,5,6,7,8,9]
         @won = false
@@ -27,6 +27,12 @@ class Chessboard
     def play_turn(player)
         puts "#{player.name} choose a location on the board! (1-9)"
         pos = gets.chomp
+
+        until (pos.to_i < 10 && pos.to_i > 0)
+            puts "Wrong position, try again!"
+            pos = gets.chomp
+        end
+
         draw_icon(player.icon, pos)
         draw_board
         game_over?(player.icon)
@@ -67,8 +73,8 @@ class Player
 end
 
 def play_a_game
-    c = Chessboard.new
-    c.draw_board
+    b = Board.new
+    b.draw_board
 
     puts "Player 1 choose an icon: ’x’ or ’o’"
     icon1 = gets.chomp 
@@ -79,9 +85,9 @@ def play_a_game
     puts "Player 2 icon is #{icon2} \n"
 
     begin 
-        c.play_turn(p1)
-        c.play_turn(p2)
-    end until c.won?
+        b.play_turn(p1)
+        b.play_turn(p2)
+    end until b.won?
 
     puts "We got a winner!"
 end
