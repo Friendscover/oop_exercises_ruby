@@ -1,19 +1,8 @@
-#six different colors
-#12 turns to decide winner
-#guess order + color of the code
-#colored small pin _> position and color right
-#white  small pin >  position wrong color right
-
-#compare color
-#compare position
-#MasterBoard is implemented like a Game class; not seperaterd in Game/Board
-#storing the board?
-
-class MasterBoard
+class Masterboard
     def initialize
         #currently no color appears twice
         @colors = ["blue", "yellow", "orange", "pink", "green", "red"]
-        @current_board = @colors.sample(4)
+        @current_board = []
         #needs to be removed 
         puts @current_board
     end
@@ -26,26 +15,11 @@ class MasterBoard
         @current_board
     end
 
-    def play_game
-        i = 0
-
-        while i < 12 
-            p1 = Player.new
-            player_choice = p1.choose_color(get_colors)
-            pins = compare_color(player_choice, get_current_board)
-            puts "Pins are #{pins}"
-            puts 
-
-            pins_counter = pins.count("black")
-            if(pins_counter == 4)
-                i = 12
-            else
-                i += 1
-            end
-        end
+    def set_current_board=(colors)
+        @current_board = colors
     end
-    
-    def compare_color(player_choice, pc_choice)
+    #change names to better reflect logic
+    def compare_choice(player_choice, pc_choice)
         pins = []
         player_choice.each_with_index do |color, index|
             #checking the players position & color
@@ -58,9 +32,6 @@ class MasterBoard
             end
         end
         pins
-    end
-
-    def compare_position(player_choice, pc_choice)
     end
 end
 
@@ -84,5 +55,92 @@ class Player
     end
 end
 
-mm = MasterBoard.new
-mm.play_game
+class Game
+    def initialize
+        play_game
+    end
+
+    def play_game
+        puts "Do you wanna guess against the Computer (1) or do you wanna pick a combination and let the Computer guess (2)? Enter (1) or (2)!"
+        answer = gets.chomp.to_i
+        p1 = Player.new
+        mb = Masterboard.new
+
+        if(answer == 1)
+            #setting the colors of the board for the player to guess
+            mb.set_current_board = mb.get_colors.sample(4)
+            puts mb.get_current_board
+
+            play_turn(p1, mb)
+        elsif(answer == 2)
+            #player choice for the color
+            mb.set_current_board = p1.choose_color(mb.get_colors)
+            #computer starts guessing
+            guess_turn(mb)
+        else
+            puts "Sorry i did not get that! Try again!"
+        end       
+    end
+
+    def play_turn(player, board)
+        i = 0
+        while i < 12
+            player_choice = player.choose_color(board.get_colors)
+            pins = board.compare_choice(player_choice, board.get_current_board)
+            puts "Pins are #{pins}"
+            puts
+
+            i = pins_counter(pins, i)
+        end
+    end
+
+    def guess_turn(board)
+        i = 1
+        answer = []
+        guess = board.get_colors.sample(4)
+
+        while i < 12 
+            puts "guess #{guess}"
+            pins = board.compare_choice(guess, board.get_current_board)
+            puts "pins #{pins}"
+            puts ""
+
+            pins.each_with_index do |pin, index|
+                if(pin == "black")
+                    answer[index] = guess[index]
+                    #rewrite code for cleaner write access
+                    board.get_colors.delete(guess[index])
+                elsif(pin == "white")
+
+                    pins.each_with_index do |whitepin, whiteindex|
+                        if((whitepin == "white") && (whiteindex != index))
+                            guess[index] = pins[whiteindex]
+                        else
+                            guess[index] = board.get_colors.sample
+                        end
+                    end
+
+                else
+                    guess[index] = board.get_colors.sample
+                end
+            end
+            i = pins_counter(pins, i)
+        end
+
+        puts "The answer is #{answer} and it took me #{i} turns!"
+    end
+
+    def pins_counter(pins, current_iteration)
+        i = current_iteration
+        count_pins = pins.count("black")
+
+        if(count_pins == 4)
+            i = 12
+        else
+            i += 1
+        end
+        return i
+    end
+end
+
+game = Game.new
