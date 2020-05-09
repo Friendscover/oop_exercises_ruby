@@ -3,12 +3,14 @@ class Masterboard
         #currently no color appears twice
         @colors = ["blue", "yellow", "orange", "pink", "green", "red"]
         @current_board = []
-        #needs to be removed 
-        puts @current_board
     end
 
     def get_colors
         @colors
+    end
+
+    def delete_colors(color)
+        @colors.delete(color)
     end
 
     def get_current_board
@@ -18,14 +20,14 @@ class Masterboard
     def set_current_board=(colors)
         @current_board = colors
     end
-    #change names to better reflect logic
-    def compare_choice(player_choice, pc_choice)
+
+    def compare_choice(guess, answer)
         pins = []
-        player_choice.each_with_index do |color, index|
-            #checking the players position & color
-            if(color == pc_choice[index] && index == pc_choice.index(color))
+        guess.each_with_index do |color, index|
+            #checking the position & color of the guess
+            if(color == answer[index] && index == answer.index(color))
                 pins << "black"
-            elsif(pc_choice.include?(color))
+            elsif(answer.include?(color))
                 pins << "white"
             else
                 pins << "empty"
@@ -95,7 +97,7 @@ class Game
     end
 
     def guess_turn(board)
-        i = 1
+        turns, i = 1, 1
         answer = []
         guess = board.get_colors.sample(4)
 
@@ -108,26 +110,28 @@ class Game
             pins.each_with_index do |pin, index|
                 if(pin == "black")
                     answer[index] = guess[index]
-                    #rewrite code for cleaner write access
-                    board.get_colors.delete(guess[index])
+                    board.delete_colors(guess[index])
                 elsif(pin == "white")
-
+                    #swapping the whitepins position 
                     pins.each_with_index do |whitepin, whiteindex|
                         if((whitepin == "white") && (whiteindex != index))
-                            guess[index] = pins[whiteindex]
+                            guess[index] = guess[whiteindex]
                         else
                             guess[index] = board.get_colors.sample
                         end
                     end
-
-                else
+                elsif(pin == "empty")
+                    board.delete_colors(guess[index])
                     guess[index] = board.get_colors.sample
+                else
+                    
                 end
             end
             i = pins_counter(pins, i)
+            turns += 1
         end
 
-        puts "The answer is #{answer} and it took me #{i} turns!"
+        puts "The answer is #{answer} and it took me #{turns} turns!"
     end
 
     def pins_counter(pins, current_iteration)
