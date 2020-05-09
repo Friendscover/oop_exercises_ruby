@@ -71,7 +71,6 @@ class Game
         if(answer == 1)
             #setting the colors of the board for the player to guess
             mb.set_current_board = mb.get_colors.sample(4)
-            puts mb.get_current_board
 
             play_turn(p1, mb)
         elsif(answer == 2)
