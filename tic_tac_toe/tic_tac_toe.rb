@@ -38,7 +38,7 @@ class Board
         game_over?(player.icon)
     end
 
-    def game_over?(player_icon)
+    def game_over?(player_icon) 
         check_player_icon_on_board = ""
         win_positions = [[1,2,3],[4,5,6],[7,8,9],[1,5,9],[1,4,7],[3,5,7],[2,5,8],[3,6,9]]
 
@@ -77,7 +77,13 @@ def play_a_game
     b.draw_board
 
     puts "Player 1 choose an icon: ’x’ or ’o’"
-    icon1 = gets.chomp 
+    icon1 = gets.chomp.downcase
+
+    #checks if the player enters a correct character for the board
+    until icon1 == "x" || icon1 == "o"
+        puts "Thats a wrong character. Try again!"
+        icon1 = gets.chomp.downcase
+    end
     p1 = Player.new("Player 1 (#{icon1})", icon1)
 
     icon1 == "x" ? icon2 = "o" : icon2 = "x"
@@ -92,4 +98,4 @@ def play_a_game
     puts "We got a winner!"
 end
 
-play_a_game
+#play_a_game
